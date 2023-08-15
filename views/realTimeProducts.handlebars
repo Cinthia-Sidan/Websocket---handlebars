@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+</head>
+
+<body>
+
+    <form id="productForm">
+        <input type="text" placeholder="Ingrese el nombre del producto" id="productName" name="productName" required>
+        <input type="text" placeholder="Ingrese el nombre del producto" id="price" name="price" required>
+        <input type="text" placeholder="Ingrese el nombre del producto" id="stock" name="stock" required>
+        <button type="submit">Add Product</button>
+    </form>
+
+    <ul id="productList"></ul>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        const productForm = document.getElementById("productForm");
+        const productList = document.getElementById("productList");
+
+        productForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const productName = document.getElementById("productName").value;
+            const productPrice = document.getElementById("price").value;
+            const stock = document.getElementById("stock").value;
+
+            // Crear un objeto que representa el producto
+            const newProduct = {
+                name: productName,
+                price: productPrice,
+                stock: stock
+            };
+
+            socket.emit("newProduct", newProduct);
+            productForm.reset();
+        });
+
+        socket.on("productList", (products) => {
+            productList.innerHTML = products.map(product => `<li>${product.name} - Price: ${product.price} - Stock: ${product.stock}</li>`).join("");
+        });
+    </script>
+</body>
+
+</html>
